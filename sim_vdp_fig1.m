@@ -1,105 +1,100 @@
-clear all
-clc
-close all
+%% Initialization
+clear; close all; clc;
 
-global SimStep
-SimStep = 0;
+% Simulation parameters
+K        = 0.5;         % Coupling strength
+plotskip = 2000;        % Interval for recording data points for plotting
+dt       = 1e-4;         % Time step
+totalSteps = plotskip * 60;  % Total number of simulation steps
 
-%rng('default')
-
-K = .5;
-plotskip = 2000;
-dt= 0.0001;
-N = 3;                  % number of agents
+% Number of agents and compute the ring Laplacian matrix
+N = 3;
 L = ringLaplacian(N);
 
-mu = [1:N]';           % initial parameters
-nu = [1:N]';   % initial parameters
-%z0 = 10*(rand(N,1)-0.5);     % random initial condition
-%y0 = 10*(rand(N,1)-0.5);     % random initial condition
-z0 = [1; 1; 1];
-y0 = [0; -2; 2];
-z = z0;
-y = y0;
+% Initial states and parameters
+mu0 = (1:N)';          % Initial mu values
+nu0 = (1:N)';          % Initial nu values
+z0  = [1; 1; 1];       % Initial z state
+y0  = [0; -2; 2];      % Initial y state
 
-k = 0;
-flag_adapt = 0;
-display_str = [ "No interaction", "Coupled", "Adaptation" ];
+% Simulation modes:
+% 0 - No couplings, 1 - With couplings, 2 - With couplings and adaptation
+modes = 0:2;
 
-
-Cstr = [ "ro", "go", "bo", "mo", "ko" ];
-Cchr = [ "r", "g", "b", "m", "k" ];
-
-
-figure
-for SimStep = 0:2
-   switch SimStep
+figure;
+for mode = modes
+    % Set coupling and adaptation based on the mode
+    k = 0;
+    flag_adapt = false;
+    switch mode
         case 1
             k = K;
         case 2
-            flag_adapt = 1;
+            k = K;
+            flag_adapt = true;
     end
 
-    z = z0;
-    y = y0;
-    count = 0;
-    rec_x = [];
-    rec_t = [];
-
-    while count < plotskip * 60
-        
-        % define derivatives
-        dz = -z+y;
-        dy = ( ones(N,1) - mu.*(z.^2-ones(N,1)) ).*(-z+y) - nu.*z - k*L*y;
-        if flag_adapt == 1
-            dmu = 0.05*( (ones(N,1) - z.^2) .* (-z+y) .* (-k*L*y) );
-            dnu = 0.05*( -nu .* z .* (-k*L*y) );
-        end
+    % Reset states and parameters for each simulation mode
+    z  = z0;
+    y  = y0;
+    mu = mu0;
+    nu = nu0;
     
-        % update states 
-        z = z + dz*dt;
-        y = y + dy*dt;
-        if flag_adapt == 1
-            mu = mu + dmu*dt;
-            nu = nu + dnu*dt;
+    count = 0;
+    rec_t = [];
+    rec_y = [];  % Records of y values
+
+    % Simulation loop
+    while count < totalSteps
+        % Compute state derivatives
+        dz = -z + y;
+        dy = (ones(N,1) - mu.*(z.^2 - 1)).*(-z + y) - nu.*z - k*L*y;
+        
+        if flag_adapt
+            dmu = 0.05 * ((ones(N,1) - z.^2) .* (-z + y) .* (-k*L*y));
+            dnu = 0.05 * (-nu .* z .* (-k*L*y));
         end
+        
+        % Update states using Euler method
+        z = z + dz * dt;
+        y = y + dy * dt;
+        if flag_adapt
+            mu = mu + dmu * dt;
+            nu = nu + dnu * dt;
+        end
+        
         count = count + 1;
         
-        
-        % draw
-        if mod(count,plotskip)==0
-            
-            rec_t = [rec_t, (count-plotskip/2)*dt];
-            rec_x = [rec_x, y];
-            
+        % Record data at specified intervals
+        if mod(count, plotskip) == 0
+            rec_t = [rec_t, (count - plotskip/2)*dt];
+            rec_y = [rec_y, y];
         end
     end
-
-    subplot(3,1,SimStep+1)
-    plot(rec_t,rec_x)
-    switch SimStep
+    
+    % Plot results for the current mode
+    subplot(3,1, mode+1)
+    plot(rec_t, rec_y, 'LineWidth', 1.5)
+    xlabel('Time'); ylabel('y');
+    switch mode
         case 0
-            title('without couplings')
+            title('Without Couplings')
         case 1
-            title('with couplings')
+            title('With Couplings')
         case 2
-            title('with couplings + adaptation')
+            title('With Couplings + Adaptation')
     end
-
 end
 
-
-
+%% Function: ringLaplacian
 function L = ringLaplacian(n)
 % ringLaplacian - Returns the Laplacian matrix of a ring (cycle) graph with n nodes.
-%
-% Syntax: L = ringLaplacian(n)
 %
 % Input:
 %   n - Number of nodes in the ring graph.
 %
 % Output:
-%   L - n-by-n Laplacian matrix of the ring graph.
+%   L - n-by-n Laplacian matrix.
 %
 % Special cases:
 %   For n = 1, L is defined as 0.
@@ -113,19 +108,17 @@ function L = ringLaplacian(n)
         return;
     end
 
-    % Initialize the adjacency matrix for an n-node ring graph
+    % Create the adjacency matrix for an n-node ring graph
     A = zeros(n);
     for i = 1:n
-        % Connect node i to node j (with wrap-around)
-        j = mod(i, n) + 1;  % Next node (wraps from n to 1)
+        j = mod(i, n) + 1;  % Wrap-around index for the ring structure
         A(i, j) = 1;
-        A(j, i) = 1;        % Since the graph is undirected
+        A(j, i) = 1;        % The graph is undirected
     end
 
-    % Degree matrix: each node has degree 2 in a ring graph (for n>=3)
+    % Degree matrix: each node has degree 2 for n >= 3 in a ring graph
     D = diag(sum(A, 2));
 
     % Laplacian matrix: L = D - A
     L = D - A;
 end
-
