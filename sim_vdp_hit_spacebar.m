@@ -48,8 +48,8 @@ while true
     dz = -z + y;
     dy = ( ones(N,1) - mu.*(z.^2 - ones(N,1)) ).*(-z + y) - nu.*z - k*L*y;
     if flag_adapt == 1
-        dmu = (ones(N,1) - z.^2) .* (-z + y) .* (-k*L*y);
-        dnu = -nu .* z .* (-k*L*y);
+        dmu = ( -(z.^2 - ones(N,1)) .* (-z+y) .* (-k*L*y) );
+        dnu = ( -z .* (-k*L*y) );
     end
 
     % update states 
