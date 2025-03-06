@@ -51,8 +51,8 @@ for mode = modes
         dy = (ones(N,1) - mu.*(z.^2 - 1)).*(-z + y) - nu.*z - k*L*y;
         
         if flag_adapt
-            dmu = 0.05 * ((ones(N,1) - z.^2) .* (-z + y) .* (-k*L*y));
-            dnu = 0.05 * (-nu .* z .* (-k*L*y));
+            dmu = 0.05*( -(z.^2 - ones(N,1)) .* (-z+y) .* (-k*L*y) );
+            dnu = 0.05*( -z .* (-k*L*y) );
         end
         
         % Update states using Euler method
