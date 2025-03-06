@@ -5,7 +5,7 @@ clear; close all; clc;
 K        = 0.5;         % Coupling strength
 plotskip = 2000;        % Interval for recording data points for plotting
 dt       = 1e-4;         % Time step
-totalSteps = plotskip * 60;  % Total number of simulation steps
+totalSteps = plotskip * 90;  % Total number of simulation steps
 
 % Number of agents and compute the ring Laplacian matrix
 N = 3;
