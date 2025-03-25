@@ -2,7 +2,7 @@
 clear; close all; clc;
 
 % Simulation parameters
-K        = 0.5;         % Coupling strength
+K        = 0.5;         %= 1;  % Coupling strength
 plotskip = 2000;        % Interval for recording data points for plotting
 dt       = 1e-4;         % Time step
 totalSteps = plotskip * 90;  % Total number of simulation steps
