@@ -2,7 +2,7 @@ We consider a multi-agent system given by
 
 $$\dot x_i = [-x_i, \sin(t)] \; \theta_i + k \textstyle{\sum_{j \in N_i}} (x_j - x_i)$$
 
-where $\theta_i \in \R^2$.
+where $\theta_i \in R^2$.
 With each component of $\theta_i(0)$ varying within $[a,b]$ ($b>a>0$), both components of 
 
 $$\theta_0^* = (1/N) \sum_{i=1}^N \theta_i(0) =: [\alpha,\beta]^T$$
