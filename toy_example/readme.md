@@ -5,3 +5,5 @@ With each component of $\theta_i(0)$ varying within $[a,b]$ ($b>a>0$), both comp
 Then, it is straightforward to see that Assumptions \ref{ass:psi} and \ref{ass:bd} hold. 
 Assumption \ref{ass:pe} is also verified because \eqref{eq:bd} becomes $\dot {\hat s} = -\alpha \hat s + \beta \sin(t)$ and thus, $\hat s(t)$ tends to $A \sin(t + \gamma)$ with $A>0$ and $\gamma \not = 0$.
 Fig.~\ref{fig:2} shows convergence of parameters (when $N=3$).
+
+![When there is no coupling](toy1.png)
