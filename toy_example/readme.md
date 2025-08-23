@@ -19,6 +19,8 @@ and thus, $\hat s(t)$ tends to $A \sin(t + \gamma)$ with $A>0$ and $\gamma \not 
 
 ### Simulation
 
+The simulation file is `toy_sim.m`.
+
 Number of agents N = 3.
 Graph is the ring graph.
 Coupling gain k = 1.
